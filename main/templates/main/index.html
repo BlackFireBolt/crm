@@ -1,0 +1,158 @@
+{% extends "layout/basic.html" %}
+
+{% load bootstrap4 %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block sidebar_index_active %}
+<li class="active">
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript" charset="utf8" src="{% static 'js/datatableview.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        datatableview.initialize($('.datatable'));
+    });
+</script>
+<div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <button class="btn btn-primary btn-round" type="button" data-toggle="modal" data-target="#addOrderModal">Добавить заказ</button>
+              </div>
+              <div class="card-body">
+              
+                <!--<div class="table-responsive">
+                  
+            </div>-->
+            <div id="main-table" class="table-responsive">{% render_table table %}</div>
+            
+             <script>
+        $(document).ready(function($) {
+    $("tr").click(function() {
+        thisdata = $(this).attr('data-href');
+        console.log(thisdata);
+
+        window.location.href = thisdata;
+    });
+});
+        </script>
+        </div>
+        </div>
+        </div>
+
+</div>
+{% endblock %}
+
+{% block add_order_modal %}
+<div class="modal fade" id="addOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Добавление заказа</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" id="add-order-form" action="{% url 'main:add-order' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+    <h5>Клиент</h5> 
+    <div class="form-row">       
+    <div class="form-group col-md-6" id="client_name">
+        {{ form.client_name.label_tag }}
+        {{ form.client_name }}
+    </div> 
+    <div class="form-group col-md-6" id="phone">
+        {{ form.phone.label_tag }}
+        {{ form.phone }}
+    </div>
+    </div>
+    <hr class="mt-5 mb-5" style="color: red;">
+    <h5>Устройство и неисправности</h5>
+    <div class="form-group" id="device_type">
+        {{ form.device_type.label_tag }}
+        {{ form.device_type }}
+    </div> 
+    <div class="form-group" id="serial_number">
+        {{ form.serial_number.label_tag }}
+        {{ form.serial_number }}
+    </div> 
+    <div class="form-group" id="brand">
+        {{ form.brand.label_tag }}
+        {{ form.brand }}
+    </div> 
+    <div class="form-group" id="model">
+        {{ form.model.label_tag }}
+        {{ form.model }}
+    </div>
+    <div class="form-group" id="equipment">
+        {{ form.equipment.label_tag }}
+        {{ form.equipment }}
+    </div> 
+    <div class="form-group" id="appearance">
+        {{ form.appearance.label_tag }}
+        {{ form.appearance }}
+    </div> 
+    <div class="form-group" id="password">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+    </div> 
+    <div class="form-group" id="malfunction">
+        {{ form.malfunction.label_tag }}
+        {{ form.malfunction }}
+    </div>
+    <hr class="mt-5 mb-5"> 
+    <h5>Дополнительная информация</h5>
+    <div class="form-group" id="receiver_notes">
+        {{ form.receiver_notes.label_tag }}
+        {{ form.receiver_notes }}
+    </div> 
+    <div class="form-group" id="indicative_price">
+        {{ form.indicative_price.label_tag }}
+        {{ form.indicative_price }}
+    </div>  
+    <div class="form-group" id="quickly"> 
+    <div class="form-check">
+     <label class="form-check-label">
+        {{ form.quickly }}
+        Срочно
+        <span class="form-check-sign">
+            <span class="check"></span>
+        </span>
+        </label>
+    </div>
+    </div>
+    <div class="form-group" id="availability_date">
+        {{ form.availability_date.label_tag }}
+        {{ form.availability_date }}
+        <script>
+            $('#post-availability_date').datetimepicker({
+            format:'Y-m-d H:i:s',
+            });
+        </script>
+    </div>
+    <hr class="mt-5 mb-5">
+    <div class="form-group" id="executor">
+        {{ form.executor.label_tag }}
+        {{ form.executor }}
+    </div> 
+    <div class="form-group" id="prepayment">
+        {{ form.prepayment.label_tag }}
+        {{ form.prepayment }}
+    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button id="add_order" type="submit" class="btn btn-primary" >Добавить заказ</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

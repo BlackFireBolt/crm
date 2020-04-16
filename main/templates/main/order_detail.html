@@ -1,0 +1,279 @@
+{% extends "layout/basic.html" %}
+
+{% load bootstrap4 %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block title %}Заказ номер {{ order.pk }}{% endblock %}
+
+{% block sidebar_index_active %}
+<li class="active">
+{% endblock %}
+
+{% block content %}
+{{ form.media }}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Заказ номер {{ order.pk }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form method="POST" id="change-order-form" action="{% url 'main:change-order' %}">
+                        <div class="card card-nav-tabs card-plain">
+                            <div class="card-header card-header-danger">
+                                <!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+                                <div class="nav-tabs-navigation">
+                                    <div class="nav-tabs-wrapper">
+                                        <ul class="nav nav-tabs" data-tabs="tabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" href="#information" data-toggle="tab">Информация о заказе</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="#works" data-toggle="tab">Работы и материалы</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="#payment" data-toggle="tab">Платежи</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body ">
+                                <div class="tab-content">
+
+                                    <div class="tab-pane active" id="information">
+
+                                            {% csrf_token %}
+                                            <h5>Клиент</h5>
+                                            <div class="form-row">
+                                                <div class="form-group col-md-6" id="client_name">
+                                                    {{ order_form.client_name.label_tag }}
+                                                    {{ order_form.client_name }}
+                                                </div>
+                                                <div class="form-group col-md-6" id="phone">
+                                                    {{ order_form.phone.label_tag }}
+                                                    {{ order_form.phone }}
+                                                </div>
+                                            </div>
+                                            <hr class="mt-5 mb-5" style="color: red;">
+                                            <h5>Устройство и неисправности</h5>
+                                            <div class="form-group" id="device_type">
+                                                {{ order_form.device_type.label_tag }}
+                                                {{ order_form.device_type }}
+                                            </div>
+                                            <div class="form-group" id="serial_number">
+                                                {{ order_form.serial_number.label_tag }}
+                                                {{ order_form.serial_number }}
+                                            </div>
+                                            <div class="form-group" id="brand">
+                                                {{ order_form.brand.label_tag }}
+                                                {{ order_form.brand }}
+                                            </div>
+                                            <div class="form-group" id="model">
+                                                {{ order_form.model.label_tag }}
+                                                {{ order_form.model }}
+                                            </div>
+                                            <div class="form-group" id="equipment">
+                                                {{ order_form.equipment.label_tag }}
+                                                {{ order_form.equipment }}
+                                            </div>
+                                            <div class="form-group" id="appearance">
+                                                {{ order_form.appearance.label_tag }}
+                                                {{ order_form.appearance }}
+                                            </div>
+                                            <div class="form-group" id="password">
+                                                {{ order_form.password.label_tag }}
+                                                {{ order_form.password }}
+                                            </div>
+                                            <div class="form-group" id="malfunction">
+                                                {{ order_form.malfunction.label_tag }}
+                                                {{ order_form.malfunction }}
+                                            </div>
+                                            <hr class="mt-5 mb-5">
+                                            <h5>Дополнительная информация</h5>
+                                            <div class="form-group" id="receiver_notes">
+                                                {{ order_form.receiver_notes.label_tag }}
+                                                {{ order_form.receiver_notes }}
+                                            </div>
+                                            <div class="form-group" id="indicative_price">
+                                                {{ order_form.indicative_price.label_tag }}
+                                                {{ order_form.indicative_price }}
+                                            </div>
+                                            <div class="form-group" id="quickly">
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        {{ order_form.quickly }}
+                                                        Срочно
+                                                        <span class="form-check-sign">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                {{ order_form.availability_date.label_tag }}
+                                                {{ order_form.availability_date }}
+                                                <script>
+                                                    $('#post-availability_date').datetimepicker({
+                                                        format:'Y-m-d H:i:s',
+                                                    });
+                                                </script>
+                                            </div>
+
+                                            <hr class="mt-5 mb-5">
+                                            <div class="form-group" id="prepayment">
+                                                {{ order_form.prepayment.label_tag }}
+                                                {{ order_form.prepayment }}
+                                            </div>
+
+                                    </div>
+                                    <div class="tab-pane" id="works">
+
+                                            <div class="form-group" id="executor">
+                                                {{ order_form.executor.label_tag }}
+                                                {{ order_form.executor }}
+                                            </div>
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <button class="btn btn-primary btn-round" type="button" data-toggle="modal" data-target="#addWorkModal">Добавить работу</button>
+                                                    {% render_table work_table %}
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="executor_note">
+                                                {{ order_form.executor_note.label_tag }}
+                                                {{ order_form.executor_note }}
+                                            </div>
+                                            <div class="form-group" id="verdict">
+                                                {{ order_form.verdict.label_tag }}
+                                                {{ order_form.verdict }}
+                                            </div>
+                                    </div>
+                                    <div class="tab-pane" id="payment">
+                                        <button class="btn btn-success btn-round" type="button" data-toggle="modal" data-target="#addIncomePaymentModal">
+                                            <i class="now-ui-icons ui-1_simple-add"></i> Добавить приход
+                                        </button>
+                                        <button class="btn btn-danger btn-round" type="button" data-toggle="modal" data-target="#addConsumptionPaymentModal">
+                                            <i class="now-ui-icons ui-1_simple-delete"></i> Добавить расход
+                                        </button>
+                                        {% render_table payment_table %}
+                                        <p class="text-right">Итого: {{ total }} руб.</p>
+                                    </div>
+                                    <button id="order_change" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Сохранить изменения</button>
+                                    <a class="btn btn-primary" href="{% url 'main:generate-pdf' pk=order.id %}">Печать</a>
+                                </div>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4 notes">
+                        <div class="card">
+                            <div class="card-body">
+                                {% for note in notes %}
+                                {% if note.order_id == order.pk %}
+                                <div class="card">
+                                    <div class="card-body">
+                                        {% if note.note_type == 'c' %}
+                                        <i class="now-ui-icons location_bookmark"></i>
+                                        {% else %}
+                                        <i class="now-ui-icons ui-2_settings-90"></i>
+                                        {% endif %}
+                                        <p class="mb-auto">{{note.text}}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                                <form method="POST" id="add-note-form" action="{% url 'main:add-note' %}">
+                                    {% csrf_token %}
+                                    <div class="form-group" id="text">
+                                        {{ note_form.text }}
+                                    </div>
+                                    <button id="add_comment" data-id="{{ order.id }}" data-type="c" type="submit" class="btn btn-primary"><i class="now-ui-icons location_bookmark"></i> Добавить комментарий</button>
+                                    <!--<button id="add_task" data-id="{{ object.id }}" data-type="t" type="submit" class="btn btn-primary"><i class="now-ui-icons ui-2_settings-90"></i> Добавить задачу</button>-->
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}<!--action="{% url 'main:add-note' %}" action="{% url 'main:add-note' %}"-->
+
+{% block add_work_modal %}
+<div class="modal fade" id="addWorkModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление работы</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" id="add-work-form" action="{% url 'main:add-work' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ work_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button id="add_work" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Добавить работу</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block add_income_modal %}
+<div class="modal fade" id="addIncomePaymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление прихода</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" id="add-income-payment-form" action="{% url 'main:add-work' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ income_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button id="add_income_payment" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block add_consumption_modal %}
+<div class="modal fade" id="addConsumptionPaymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление расхода</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" id="add-consumption-payment-form" action="{% url 'main:add-work' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ consumption_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button id="add_consumption_payment" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
