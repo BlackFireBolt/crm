@@ -1,7 +1,4 @@
-    @font-face {
-        font-family: Arial;
-        src: url({% static 'fonts/Areal.TTF' %});
-    }
+
         body {
     font-family:Arial, sans-serif;
     color:#222;
