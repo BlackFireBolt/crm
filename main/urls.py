@@ -2,11 +2,13 @@ from django.urls import path
 
 from .views import OrderListView, order_detail, payment_list
 from .views import add_note, add_order, change_order, add_work, add_payment
-from .views import generate_pdf
+from .views import generate_pdf, PdfView, generate_pdf_wp
 
 app_name = 'main'
 urlpatterns = [
-    path('print/<int:pk>', generate_pdf, name='generate-pdf'),
+    path('printweasyprint/<int:pk>/', generate_pdf_wp, name='generate-pdf-wp'),
+    path('printWP/<int:pk>/', PdfView.as_view(), name='generate-pdf-ws'),
+    path('print/<int:pk>/', generate_pdf, name='generate-pdf'),
     path('add-payment/', add_payment, name='add-payment'),
     path('add-work/', add_work, name='add-work'),
     path('change-order/', change_order, name='change-order'),

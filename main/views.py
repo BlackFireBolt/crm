@@ -7,7 +7,9 @@ import json
 from django.conf import settings
 from django.template.loader import render_to_string
 import weasyprint
+import tempfile
 from django_tables2 import SingleTableView, LazyPaginator
+from django_weasyprint import WeasyTemplateResponseMixin
 
 from .utils import render_to_pdf
 from .models import Order, Comment, Note, CompletedWork, Payment
@@ -278,3 +280,42 @@ def generate_pdf(request, pk):
     order_pdf = get_object_or_404(Order, id=pk)
     pdf = render_to_pdf('main/pdf.html', {'order': order_pdf, 'static': settings.STATIC_ROOT})
     return HttpResponse(pdf, content_type='application/pdf')
+
+
+class PdfView(DetailView):
+    model = Order
+    template_name = 'main/pdf.html'
+
+
+class MyModelPrintView(WeasyTemplateResponseMixin, PdfView):
+    # output of MyModelView rendered as PDF with hardcoded CSS
+    pdf_stylesheets = [
+        settings.STATIC_ROOT + 'css/pdf.css',
+        ]
+    # show pdf in-line (default: True, show download dialog)
+    pdf_attachment = False
+    # suggested filename (is required for attachment!)
+    pdf_filename = 'foo.pdf'
+
+
+def generate_pdf_wp(request, pk):
+    """Generate pdf."""
+    # Model data
+    order = get_object_or_404(Order, pk=pk)
+
+    # Rendered
+    html_string = render_to_string('main/pdf.html', {'order': order})
+    html = weasyprint.HTML(string=html_string)
+    result = html.write_pdf()
+
+    # Creating http response
+    response = HttpResponse(content_type='application/pdf;')
+    response['Content-Disposition'] = 'inline; filename=order_pdf.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output = open(output.name, 'rb')
+        response.write(output.read())
+
+    return response

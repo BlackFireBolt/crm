@@ -162,7 +162,7 @@
                                         <p class="text-right">Итого: {{ total }} руб.</p>
                                     </div>
                                     <button id="order_change" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Сохранить изменения</button>
-                                    <a class="btn btn-primary" href="{% url 'main:generate-pdf' pk=order.id %}">Печать</a>
+                                    <a class="btn btn-primary" href="{% url 'main:generate-pdf-wp' pk=order.id %}">Печать</a>
                                 </div>
                             </div>
                         </div>

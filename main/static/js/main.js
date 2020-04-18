@@ -237,3 +237,9 @@ function create_payment (payment_type, payment_id, payment_description, payment_
     }
     });
 };
+
+$(function(){
+$( "#addOrderModal" ).on('shown', function(){
+    alert("I want this to appear after the modal has opened!");
+});
+});
