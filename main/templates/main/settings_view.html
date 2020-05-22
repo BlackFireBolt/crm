@@ -1,0 +1,34 @@
+{% extends "layout/basic.html" %}
+
+{% load bootstrap4 %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block title %}Заказ номер {{ order.pk }}{% endblock %}
+
+{% block head_settings_media %}
+{{ pdf_form.media }}
+{% endblock %}
+
+{% block sidebar_settings_view_active %}
+<li class="active">
+    {% endblock %}
+
+    {% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Настройки</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/your-name/" method="post">
+                        {% csrf_token %}
+                        {{ pdf_form.as_p }}
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

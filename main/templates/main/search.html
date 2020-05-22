@@ -1,0 +1,53 @@
+{% extends "layout/basic.html" %}
+
+{% load bootstrap4 %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block sidebar_index_active %}
+<li class="active">
+    {% endblock %}
+
+    {% block content %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript" charset="utf8" src="{% static 'js/datatableview.js' %}"></script>
+    <script type="text/javascript">
+    $(function(){
+        datatableview.initialize($('.datatable'));
+    });
+</script>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-primary btn-round" type="button" data-toggle="modal" data-target="#addOrderModal" id="addOrderModalButton">Добавить заказ</button>
+                </div>
+                <div class="card-body">
+
+                    <!--<div class="table-responsive">
+
+                </div>-->
+                    {% if object_list %}
+                    <div id="main-table" class="table-responsive">{% render_table object_list %}</div>
+
+                    <script>
+        $(document).ready(function($) {
+    $("tr").click(function() {
+        thisdata = $(this).attr('data-href');
+        console.log(thisdata);
+
+        window.location.href = thisdata;
+    });
+});
+        </script>
+                    {% else %}
+                    <div>По данному запросу ничего не найдено</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endblock %}
