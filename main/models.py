@@ -1,6 +1,12 @@
 from django.db import models
 from django.urls import reverse
 from datetime import datetime, timedelta
+from tinymce.models import HTMLField
+from os.path import splitext
+
+
+def get_timestamp_path(instance, filename):
+    return '%s%s' % (datetime.now().timestamp(), splitext(filename)[1])
 
 
 def now_plus_5():
@@ -51,6 +57,9 @@ class Order(models.Model):
 
     def get_absolute_url(self):
         return reverse("main:order-detail", kwargs={"pk": self.pk})
+
+    def __str__(self):
+        return self.client_name
 
     class Meta:
         verbose_name = 'Заказ'
@@ -105,9 +114,9 @@ class CompletedWork(models.Model):
 
 
 class Payment(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Заказ')
     description = models.TextField(verbose_name="Работа")
-    data = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата')
+    date = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата')
     total = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Сумма")
     OPTIONS = (
         ('c', 'Расход'),
@@ -116,19 +125,33 @@ class Payment(models.Model):
     type = models.CharField(max_length=1, choices=OPTIONS, default='c', verbose_name='Тип платежа')
 
     class Meta:
+        ordering = ['-date']
         verbose_name = "Платеж"
         verbose_name_plural = "Платежи"
 
 
-class Income(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
-    description = models.TextField(verbose_name="Работа")
-    data = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата')
-    total = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Сумма")
+class Settings(models.Model):
+    name = models.CharField(max_length=32, verbose_name='Имя')
+
+    class Meta:
+        verbose_name = "Настройка"
+        verbose_name_plural = "Настройки"
 
 
-class Consumption(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
-    description = models.TextField(verbose_name="Работа")
-    data = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата')
-    total = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Сумма")
+class PdfTemplate(models.Model):
+    settings = models.ForeignKey(Settings, on_delete=models.CASCADE, verbose_name='Экземляр настроек')
+    name = models.CharField(max_length=32, verbose_name='Имя')
+    pdf_text = models.TextField(verbose_name='Текст пдф')
+
+    class Meta:
+        verbose_name = "Пдф шаблон"
+        verbose_name_plural = "Пдф шаблоны"
+
+
+class AdditionalImage(models.Model):
+    settings = models.ForeignKey(Settings, on_delete=models.CASCADE, verbose_name='Экземпляр настроек')
+    image = models.ImageField(upload_to=get_timestamp_path, verbose_name='Изображение')
+
+    class Meta:
+        verbose_name = "Дополнительная иллюстрация"
+        verbose_name_plural = "Дополнительные иллюстрации"

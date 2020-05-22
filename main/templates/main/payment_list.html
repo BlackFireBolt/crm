@@ -18,10 +18,16 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-
+                        <button class="btn btn-success btn-round" type="button" data-toggle="modal" data-target="#addIncomePaymentModal">
+                            <i class="now-ui-icons ui-1_simple-add"></i> Добавить приход
+                        </button>
+                        <button class="btn btn-danger btn-round" type="button" data-toggle="modal" data-target="#addConsumptionPaymentModal">
+                            <i class="now-ui-icons ui-1_simple-delete"></i> Добавить расход
+                        </button>
                     </div>
                     <div class="col-md-8">
                         {% render_table payment_list_table %}
+                        <p class="text-right">Итого: {{ total }} руб.</p>
                     </div>
                 </div>
             </div>
@@ -29,3 +35,53 @@
     </div>
 </div>
 {% endblock %}
+
+    {% block add_income_modal %}
+    <div class="modal fade" id="addIncomePaymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление прихода</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" id="add-income-payment-form" action="{% url 'main:add-work' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        {{ income_form.as_p }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button id="add_income_payment" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block add_consumption_modal %}
+    <div class="modal fade" id="addConsumptionPaymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление расхода</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" id="add-consumption-payment-form" action="{% url 'main:add-work' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        {{ consumption_form.as_p }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button id="add_consumption_payment" data-id="{{ order.id }}" type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

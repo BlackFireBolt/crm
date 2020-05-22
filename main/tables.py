@@ -27,11 +27,17 @@ class PaymentTable(tables.Table):
     class Meta:
         model = Payment
         template_name = "django_tables2/bootstrap.html"
-        fields = ("data", "description",  "total")
+        fields = ("date", "description",  "total")
+        row_attrs = {
+            'class': lambda record: record.type
+        }
 
 
 class PaymentListTable(tables.Table):
     class Meta:
         model = Payment
         template_name = "django_tables2/bootstrap.html"
-        fields = ("order__id", "data", "description",  "total")
+        fields = ("order__id", "date", "description",  "total")
+        row_attrs = {
+            'class': lambda record: record.type
+        }

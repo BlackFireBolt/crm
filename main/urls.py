@@ -1,11 +1,14 @@
 from django.urls import path
 
-from .views import OrderListView, order_detail, payment_list
+from .views import OrderListView, order_detail, payment_list, SearchResultsView
 from .views import add_note, add_order, change_order, add_work, add_payment
 from .views import generate_pdf, PdfView, generate_pdf_wp
+from .views import settings_view
 
 app_name = 'main'
 urlpatterns = [
+    path('search/', SearchResultsView.as_view(), name='search'),
+    path('settings/', settings_view, name='settings-view'),
     path('printweasyprint/<int:pk>/', generate_pdf_wp, name='generate-pdf-wp'),
     path('printWP/<int:pk>/', PdfView.as_view(), name='generate-pdf-ws'),
     path('print/<int:pk>/', generate_pdf, name='generate-pdf'),

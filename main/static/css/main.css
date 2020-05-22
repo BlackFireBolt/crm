@@ -6,4 +6,10 @@
     height: 2px; /* Толщина линии */
    }
 
+.table .i {
+    background-color: rgba(15, 186, 3, 0.58);
+}
 
+.table .c{
+    background-color: rgba(186, 3, 3, 0.58);
+}

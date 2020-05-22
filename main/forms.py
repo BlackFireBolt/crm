@@ -1,8 +1,10 @@
 from django import forms
 from tempus_dominus.widgets import DateTimePicker
+from tinymce.widgets import TinyMCE
 
 
 from .models import Order, Comment, Note, CompletedWork, Payment
+from .models import PdfTemplate
 
 
 class OrderForm(forms.ModelForm):
@@ -147,6 +149,25 @@ class IncomeForm(forms.ModelForm):
         }
 
 
+class IncomeFormList(forms.ModelForm):
+    order = forms.ModelChoiceField(queryset=Order.objects.all(), label='Заказ', required=False)
+
+    class Meta:
+        model = Payment
+        fields = ['order', 'description', 'total', ]
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'id': 'post-income-description',
+                'class': 'form-control',
+                'required': True
+            }),
+            'total': forms.NumberInput(attrs={
+                'id': 'post-income-total',
+                'required': True,
+            }),
+        }
+
+
 class ConsumptionForm(forms.ModelForm):
     class Meta:
         model = Payment
@@ -163,3 +184,29 @@ class ConsumptionForm(forms.ModelForm):
             }),
         }
 
+
+class ConsumptionFormList(forms.ModelForm):
+    order = forms.ModelChoiceField(queryset=Order.objects.all(), label='Заказ', required=False)
+
+    class Meta:
+        model = Payment
+        fields = ['order', 'description', 'total', ]
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'id': 'post-consumption-description',
+                'class': 'form-control',
+                'required': True
+            }),
+            'total': forms.NumberInput(attrs={
+                'id': 'post-consumption-total',
+                'required': True,
+            }),
+        }
+
+
+class PdfTemplateForm(forms.ModelForm):
+    pdf_text = forms.CharField(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}))
+
+    class Meta:
+        model = PdfTemplate
+        fields = ['settings', 'name', 'pdf_text']

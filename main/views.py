@@ -8,13 +8,19 @@ from django.conf import settings
 from django.template.loader import render_to_string
 import weasyprint
 import tempfile
+import django_tables2 as tables
+from django.contrib.postgres.search import SearchVector
 from django_tables2 import SingleTableView, LazyPaginator
 from django_weasyprint import WeasyTemplateResponseMixin
+from django.template import Template, Context, RequestContext
 
 from .utils import render_to_pdf
 from .models import Order, Comment, Note, CompletedWork, Payment
+from .models import Settings, PdfTemplate, AdditionalImage
 from .tables import OrderTable, WorkTable, PaymentTable, PaymentListTable
-from .forms import OrderForm, NoteForm, CompletedWorkForm, IncomeForm, ConsumptionForm
+from .forms import OrderForm, NoteForm, CompletedWorkForm, IncomeFormList, ConsumptionFormList, IncomeForm
+from .forms import ConsumptionForm
+from .forms import PdfTemplateForm
 
 
 class OrderListView(SingleTableView):
@@ -272,8 +278,20 @@ def add_payment(request):
 
 
 def payment_list(request):
-    payment_list_table = PaymentListTable(Payment.objects.all())
-    return render(request, 'main/payment_list.html', {'payment_list_table': payment_list_table})
+    income_form = IncomeFormList()
+    consumption_form = ConsumptionFormList()
+    payment = Payment.objects.all()
+    payment_list_table = PaymentListTable(payment)
+    payment_list_table.paginate(page=request.GET.get('page', 1), per_page=25)
+    total = 0
+    for pay in payment:
+        if pay.type == 'c':
+            total -= pay.total
+        elif pay.type == 'i':
+            total += pay.total
+    return render(request, 'main/payment_list.html', {'payment_list_table': payment_list_table,
+                                                      'income_form': income_form, 'consumption_form': consumption_form,
+                                                      'total': total})
 
 
 def generate_pdf(request, pk):
@@ -302,9 +320,13 @@ def generate_pdf_wp(request, pk):
     """Generate pdf."""
     # Model data
     order = get_object_or_404(Order, pk=pk)
-
+    html_text = get_object_or_404(PdfTemplate, pk=1)
     # Rendered
-    html_string = render_to_string('main/pdf.html', {'order': order})
+    template = Template(html_text.pdf_text)
+    work_table = WorkTable(CompletedWork.objects.filter(order=pk))
+    image = get_object_or_404(AdditionalImage, pk=1)
+    context = RequestContext(request, {'order': order, 'work_table': work_table, 'image': image})
+    html_string = template.render(context)
     html = weasyprint.HTML(string=html_string)
     result = html.write_pdf()
 
@@ -319,3 +341,22 @@ def generate_pdf_wp(request, pk):
         response.write(output.read())
 
     return response
+
+
+def settings_view(request):
+    settings_obj = get_object_or_404(Settings, pk=1)
+    pdf_form = PdfTemplateForm()
+    return render(request, 'main/settings_view.html', {'settings_obj': settings_obj, 'pdf_form': pdf_form})
+
+
+class SearchResultsView(SingleTableView):
+    model = Order
+    template_name = 'main/search.html'
+    table_class = OrderTable
+    paginator_class = LazyPaginator
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        search_vector = SearchVector()
+        object_list = Order.objects.annotate(search=search_vector).filter(search=query)
+        return object_list

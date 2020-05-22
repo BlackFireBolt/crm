@@ -28,20 +28,10 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}">
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/jquery.datetimepicker.full.min.js' %}"></script>
-    <template id="x-css">
-bs-alert, bs-carousel, bs-progress {
-	display: block;
-}
 
-bs-modal .x-modal-no-title {
-	border-bottom: none;
-}
+    {% block head_settings_media %}
+    {% endblock %}
 
-bs-modal  .x-modal-no-title > .modal-title {
-	display: none;
-}
-</template>
-    
   </head>
   <body>
   <!-- sidebar -->
@@ -78,8 +68,8 @@ bs-modal  .x-modal-no-title > .modal-title {
             <p>Платежи</p>
           </a>
         </li>
-          <li>
-            <a href="#">
+          {% block sidebar_settings_view_active %}<li>{% endblock %}
+            <a href="{% url 'main:settings-view' %}">
 
               <i class="now-ui-icons ui-1_settings-gear-63"></i>
 
@@ -113,9 +103,9 @@ bs-modal  .x-modal-no-title > .modal-title {
             <span class="navbar-toggler-bar navbar-kebab"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end" id="navigation">
-            <form>
+            <form action="{% url 'main:search' %}" method="get">
               <div class="input-group no-border">
-                <input type="text" value="" class="form-control" placeholder="Search...">
+                <input type="text" value="" class="form-control" placeholder="Поиск...">
                 <div class="input-group-append">
                   <div class="input-group-text">
                     <i class="now-ui-icons ui-1_zoom-bold"></i>
